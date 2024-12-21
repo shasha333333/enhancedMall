@@ -5,7 +5,11 @@ let options = {
   host: "localhost",
   port: 3306,
   user: "root",
+<<<<<<< HEAD
   password: "admin",
+=======
+  password: "root",
+>>>>>>> d87d4b1c56a8769851052e01000a28e2a4d5b854
   database: "mall"
 };
 
