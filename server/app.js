@@ -17,7 +17,7 @@ app.use(session({
   resave : false,           //强制保存session
   saveUninitialized: true,  //强制未初始化的session存储
   cookie : {
-    maxAge : 1000 * 600,      //过期时间600秒
+    maxAge : 1000 * 60 * 10,      //过期时间10分钟
     secure : false,         //不需要https协议也能使用
   }
 }))

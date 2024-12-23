@@ -2,7 +2,7 @@
     <div class="home">
     <div class="tan-header container">
       <div class="tan-header-logo">
-        <a href="/productList"><img src="@/assets/malllogo.png" /></a>
+        <a href="/"><img src="@/assets/malllogo.png" /></a>
       </div>
       <ul class="tan-header-nav">
         <li
