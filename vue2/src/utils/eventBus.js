@@ -1,0 +1,3 @@
+// src/utils/eventBus.js
+import Vue from 'vue';
+export const EventBus = new Vue();

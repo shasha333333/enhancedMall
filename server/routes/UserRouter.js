@@ -75,7 +75,14 @@ function profile(req, res) {
     db.sql("SELECT * FROM user WHERE id = ?", userId)
         .then(result => {
             if (result.length > 0) {
-                const user = result[0];
+                // 返回用户信息，排除 password 字段
+                const user = {
+                    id: result[0].id,
+                    username: result[0].username,
+                    email: result[0].email,
+                    avatar: result[0].avatar,
+                    // 其他需要返回的字段
+                };
                 res.send({ code: 200, message: user });
             } else {
                 res.send({ code: 404, message: '用户不存在' });
@@ -93,6 +100,23 @@ function profile(req, res) {
  */
 function logout(req, res) {
     res.send({ code: 200, message: '退出成功' });
+}
+
+/**
+ * 更新用户名
+ */
+function updateUsername(req, resp) {
+    let username = req.body.username
+    let userId = req.session.user.id
+    db.sql("update user set username =? where id =?", username, userId)
+       .then(res => {
+            console.log(res);
+            resp.send({ code: 200, message: "修改用户名成功!" });
+        })
+       .catch(err => {
+            console.log(err);
+            resp.send({ code: 500, err })
+        })  
 }
 
 
@@ -162,9 +186,10 @@ function updateEmail(req, resp) {
 router.post("/login", login)
 router.post("/register", register)
 router.get("/profile", verifyToken, profile);
-router.post("/updateAvatar", updateAvatar)
-router.post("/updatePassword", updatePassword)
-router.post("/updateEmail", updateEmail)
+router.post("/updateAvatar", verifyToken, updateAvatar)
+router.post("/updatePassword", verifyToken, updatePassword)
+router.post("/updateEmail", verifyToken, updateEmail)
+router.post("/updateUsername", verifyToken, updateUsername)
 router.post("/logout", logout)
 
 module.exports = router

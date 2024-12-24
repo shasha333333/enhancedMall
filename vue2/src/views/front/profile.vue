@@ -12,8 +12,8 @@
       <img :src="user.avatar" style="width: 250px;" />
       <el-menu-item index="1">个人中心</el-menu-item>
       <el-menu-item index="2">消息通知</el-menu-item>
-      <el-menu-item index="3">个人信息</el-menu-item>
-      <el-menu-item index="4">安全设置</el-menu-item>
+      <el-menu-item index="3" @click="gotoProfileManage">个人信息</el-menu-item>
+      <el-menu-item index="4" @click="gotSafeManage">安全设置</el-menu-item>
       <el-menu-item index="5">地址管理</el-menu-item>
     </el-menu>
 
@@ -31,12 +31,12 @@
         <div v-if="carts.length" class="cart"  style="flex: 1;">
           <div class="list"  style="flex: 1;">
               <el-row type="flex" justify="space-between" class="cart-header">
-                <el-col :span="4" class="img">&nbsp;</el-col>
-                <el-col :span="6" class="name">商品名称</el-col>
-                <el-col :span="4" class="price">单价</el-col>
-                <el-col :span="4" class="num">数量</el-col>
-                <el-col :span="4" class="total">小计</el-col>
-                <el-col :span="2" class="action">              
+                <el-col :span="4" class="img" style="display: flex; align-items: center; justify-content: center;">&nbsp;</el-col>
+                <el-col :span="6" class="name" style="display: flex; align-items: center; justify-content: center;">商品名称</el-col>
+                <el-col :span="4" class="price"  style="display: flex; align-items: center; justify-content: center;">单价</el-col>
+                <el-col :span="4" class="num" style="display: flex; align-items: center; justify-content: center;">数量</el-col>
+                <el-col :span="4" class="total" style="display: flex; align-items: center; justify-content: center;">小计</el-col>
+                <el-col :span="2" class="action" style="display: flex; align-items: center; justify-content: center;">              
                   <router-link :to="{ path: '/cart' }">
                     查看更多<i class="el-icon-arrow-right" style="color: blue;"></i> 
                   </router-link>
@@ -66,7 +66,7 @@
               
                 <!-- 数量 -->
                 <el-col :span="4" class="num" style="display: flex; align-items: center; justify-content: center;">
-                  ×{{ cart.quantity }}
+                  <strong>×{{ cart.quantity }}</strong>
                 </el-col>
               
                 <!-- 小计 -->
@@ -144,6 +144,12 @@ export default {
     },
     viewAllOrders() {
       console.log("查看全部订单");
+    },
+    gotoProfileManage() {
+      this.$router.push({ path: '/profileManage' });
+    },
+    gotSafeManage() {
+      this.$router.push({ path: '/safeManage' });
     },
   },
 };

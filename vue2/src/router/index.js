@@ -17,6 +17,7 @@ const routes = [
   { path: '/order', component: () => import('../views/front/order.vue') },
   { path: '/profile', component: () => import('../views/front/profile.vue') },
   { path: '/profileManage', component: () => import('../views/front/profileManage.vue') },
+  { path: '/safeManage', component: () => import('../views/front/safeManage.vue') },
 ]
 
 const router = new VueRouter({

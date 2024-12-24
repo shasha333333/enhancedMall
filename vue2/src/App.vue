@@ -9,7 +9,7 @@
           <div v-if="user.username">
             <img :src="user.avatar" style="width: 16px;height:16px;" />
             <span>{{ user.username }}</span>
-            <button @click="dologout">退出</button>
+            <span @click="dologout">退出</span>
             <router-link :to="{ path: '/cart' }">购物车</router-link>
             <router-link :to="{ path: '/profile' }">个人中心</router-link>
           </div>
@@ -96,6 +96,7 @@
 </template>
 <script>
 import axios from 'axios'
+import { EventBus } from '@/utils/eventBus';
 export default {
   name: "App",
   data() {
@@ -144,8 +145,20 @@ export default {
         console.log(err);
       });
     this.loadUser();
+    // 监听来自子组件的事件
+    EventBus.$on('userUpdated', (updatedUser) => {
+      this.loadUser();
+    });
+    EventBus.$on('safeUpdated', (safeUpdated) => {
+      this.dologout();
+    });
     //     // 每隔5分钟发送一次心跳请求
     // this.startHeartbeat();
+  },
+  computed: {
+    // isAuthenticated() {
+    //   return !!localStorage.getItem('token');
+    // },
   },
   methods: {
     doLogin() {
@@ -239,11 +252,12 @@ export default {
             localStorage.removeItem('isAuthenticated');
             this.user = {};
             console.log(res.session);
-            this.$message({
-              showClose: true,
-              message: '退出成功！',
-              type: 'success'
-            });
+            // this.$message({
+            //   showClose: true,
+            //   message: '退出成功！',
+            //   type: 'success'
+            // });
+            console.log(res.data.message);
 
             const currentPath = this.$route.path; // 获取当前路由路径
             // 如果当前路径不是主页面（'/')，则重定向到主页
