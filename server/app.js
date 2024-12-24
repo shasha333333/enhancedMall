@@ -4,6 +4,8 @@ const express = require('express')
 const app = express()
 //定义监听端口号
 const port = 3000
+// 引入验证中间件
+const { verifyToken } = require('./middlewares/authUtils');
 
 //公开静态资源
 app.use('/public/',express.static('./public/'))
@@ -22,8 +24,8 @@ app.use(session({
   }
 }))
 
-//
-
+// 定义需要登录的路径
+const protectedPaths = ['/cart/', '/contact/', '/order/'];
 
 // 让express处理json数据
 app.use(express.json())
@@ -75,16 +77,23 @@ let productRouter = require("./routes/ProductRouter")
 app.use("/product", productRouter);
 
 
-//利用中间件，设置需要登录的路径
-app.use("/", (req, resp, next) => {
-  if ((req.path.indexOf("/cart/") >= 0
-   || req.path.indexOf("/contact/") >= 0
-   || req.path.indexOf("/order/") >= 0)  && !req.session.user) {
-      resp.send({ code: 400, message: "请先登录" });
-      return;
+// 中间件：验证是否登录
+app.use((req, res, next) => {
+  // 判断当前路径是否需要登录验证
+  const isProtectedPath = protectedPaths.some(path => req.path.includes(path));
+
+  // 如果是需要登录的路径，进行验证
+  if (isProtectedPath) {
+    // 先使用 Token 验证
+    return verifyToken(req, res, () => {
+      console.log("Token 验证通过");
+      next();
+    });
   }
-  next()
-})
+
+  // 如果不是需要验证的路径，继续处理请求
+  next();
+});
 
 let cartRouter = require("./routes/CartRouter")
 

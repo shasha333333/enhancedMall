@@ -79,7 +79,9 @@ export default {
             detailId: this.product.details[this.product.showIndex].id
         }
         axios
-        .post("/api/cart/add", data)
+        .post("/api/cart/add", data, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        })
         .then((res) => {
             if ( res.data.code == 200 )
                 this.$message.success(res.data.message)

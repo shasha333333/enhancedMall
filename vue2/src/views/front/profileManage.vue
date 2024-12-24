@@ -40,6 +40,8 @@
   </div>
 </template>
 <script>
+import axios from 'axios';
+
 export default {
   data() {
     return {
@@ -51,7 +53,22 @@ export default {
       avatarUrl: '', // 用户头像 URL
     };
   },
+  mounted() {
+    this.loadUser();
+  },
   methods: {
+    loadUser() {
+      axios.get('/api/user/profile', {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      })
+        .then(res => {
+          this.user = res.data.message; // 设置用户信息
+        })
+        .catch(err => {
+          console.log(err);
+          this.$message.error('获取用户信息失败');
+        });
+    },
     // 头像上传之前的处理
     beforeAvatarUpload(file) {
       const isImage = file.type.startsWith('image/');
@@ -126,4 +143,6 @@ export default {
 .avatar-uploader {
   display: inline-block;
 }
+
+
 </style>

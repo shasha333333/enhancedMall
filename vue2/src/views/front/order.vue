@@ -75,7 +75,9 @@ export default {
         }
     },
     mounted() {
-        axios.get("/api/order/list")
+        axios.get("/api/order/list",{
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+            })
             .then(res => {
                 this._orders = res.data;
                 this.orders = res.data

@@ -11,10 +11,9 @@
                     <h3 class="header">收货地址</h3>
                     <!--这里插入从服务端获取的收货地址列表-->
                     <ul class="tan-contact-list">
-                        <li v-for="contact in contacts" :key="contact.id" class="tan-contact-list-item" 
-                            :class="{active: currentContact && contact.id == currentContact.id}" 
-                            @click="currentContact = contact"
-                        >
+                        <li v-for="contact in contacts" :key="contact.id" class="tan-contact-list-item"
+                            :class="{ active: currentContact && contact.id == currentContact.id }"
+                            @click="currentContact = contact">
                             <div class="tan-contact-info">
                                 <div class="tan-contact-info-name">
                                     {{ contact.name }}
@@ -38,7 +37,8 @@
                             <div class="img">
                                 <img :src="cart.image">
                             </div>
-                            <div class="name" :title="cart.name + ' ' + cart.pname">{{ cart.name + " " + cart.pname }}</div>
+                            <div class="name" :title="cart.name + ' ' + cart.pname">{{ cart.name + " " + cart.pname }}
+                            </div>
                             <div class="price-box">
                                 <span class="price">{{ cart.sale_price }} × {{ cart.quantity }}</span>
                                 <span class="total">{{ (cart.sale_price * cart.quantity).toFixed(2) }}元</span>
@@ -111,28 +111,36 @@ export default {
     },
     methods: {
         getContactList() {
-            axios.get("/api/contact/list")
+            axios.get("/api/contact/list", {
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+            })
                 .then(res => {
                     this.contacts = res.data;
                 });
         },
         getCarts() {
-            axios.get("/api/cart/list")
+            axios.get("/api/cart/list", {
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+            })
                 .then(res => {
                     this.carts = res.data
                 })
         },
         buy() {
-            if ( !this.currentContact ) {
+            if (!this.currentContact) {
                 this.$message.warning("请选择联系人")
                 return
             }
-            axios.post("/api/order/buy",{
-                contactId : this.currentContact.id,
-                products : this.carts
-            })
+            axios.post("/api/order/buy",
+                {
+                    contactId: this.currentContact.id,
+                    products: this.carts
+                },
+                {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+                })
                 .then(res => {
-                    if ( res.data.code == 200 ) {                        
+                    if (res.data.code == 200) {
                         this.orderId = res.data.data;
                         this.visible = true;
                     }
@@ -140,10 +148,16 @@ export default {
                 })
         },
         pay() {
-            axios.post("/api/order/pay",
-            { orderId : this.orderId})
+            axios
+                .post("/api/order/pay",
+                    {
+                        orderId: this.orderId,
+                    },
+                    {
+                        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+                    })
                 .then(res => {
-                    if ( res.data.code == 200 ) this.$message.success(res.data.message)
+                    if (res.data.code == 200) this.$message.success(res.data.message)
                     else this.$message.warning(res.data.message)
                     this.$router.push({ path: "/order" })
                 })
@@ -160,26 +174,26 @@ export default {
 
 <style>
 .tan-page-header {
-  height: 63px;
-  color: #616161;
-  border-bottom: 1px solid #e0e0e0;
-  box-shadow: 0 5px 5px rgb(0 0 0 / 7%);
-  width: 100%;
-  background-color: #fff;
-  position: relative;
-  z-index: 999;
+    height: 63px;
+    color: #616161;
+    border-bottom: 1px solid #e0e0e0;
+    box-shadow: 0 5px 5px rgb(0 0 0 / 7%);
+    width: 100%;
+    background-color: #fff;
+    position: relative;
+    z-index: 999;
 }
 
 .tan-page-header h2 {
-  color: #424242;
-  font-size: 18px;
-  font-weight: 400;
-  line-height: 60px;
+    color: #424242;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 60px;
 }
 
 .container {
-  width: 1226px;
-  margin: 0 auto;
+    width: 1226px;
+    margin: 0 auto;
 }
 
 .tan-contact-list {
@@ -202,7 +216,7 @@ export default {
     margin: 0 17px 20px 0;
 }
 
-.tan-contact-list > .tan-contact-list-item.active {
+.tan-contact-list>.tan-contact-list-item.active {
     border-color: #ff6700;
 }
 
@@ -218,7 +232,7 @@ export default {
     position: relative;
 }
 
-.tan-contact-info-name > span {
+.tan-contact-info-name>span {
     position: absolute;
     right: 0;
     color: #b0b0b0;
@@ -238,7 +252,7 @@ export default {
     transition: all .3s;
 }
 
-.tan-contact-action > span {
+.tan-contact-action>span {
     margin-left: 10px;
 }
 
@@ -246,7 +260,7 @@ export default {
     border-color: #b0b0b0;
 }
 
-.tan-contact-list-item:hover > .tan-contact-action {
+.tan-contact-list-item:hover>.tan-contact-action {
     opacity: 1;
 }
 
@@ -256,11 +270,11 @@ export default {
     padding-top: 30px;
 }
 
-.buy > .body {
+.buy>.body {
     padding: 0 24px;
 }
 
-.buy > .body .header {
+.buy>.body .header {
     color: #333;
     font-size: 18px;
     line-height: 20px;
@@ -268,22 +282,22 @@ export default {
     margin-bottom: 20px;
 }
 
-.buy > .body > .products > .list > .item {
+.buy>.body>.products>.list>.item {
     display: flex;
     padding: 15px 0;
     align-items: center;
 }
 
-.buy > .body > .products > .list > .item > .img {
+.buy>.body>.products>.list>.item>.img {
     margin-right: 10px;
 }
 
-.buy > .body > .products > .list > .item > .img > img {
+.buy>.body>.products>.list>.item>.img>img {
     width: 30px;
     height: 30px;
 }
 
-.buy > .body > .products > .list > .item > .name {
+.buy>.body>.products>.list>.item>.name {
     width: 650px;
     overflow: hidden;
     white-space: nowrap;
@@ -292,46 +306,46 @@ export default {
     color: #424242;
 }
 
-.buy > .body > .products > .list > .item > .price-box > span {
+.buy>.body>.products>.list>.item>.price-box>span {
     display: inline-block;
 }
 
-.buy > .body > .products > .list > .item > .price-box > .price {
+.buy>.body>.products>.list>.item>.price-box>.price {
     width: 150px;
     text-align: center;
 }
 
-.buy > .body > .products > .list > .item > .price-box > .total {
+.buy>.body>.products>.list>.item>.price-box>.total {
     width: 290px;
     text-align: right;
     color: #ff6700;
 }
 
-.buy > .body > .total-price {
+.buy>.body>.total-price {
     border-top: 1px solid #e0e0e0;
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
 }
 
-.buy > .body > .total-price > .header {
+.buy>.body>.total-price>.header {
     padding: 20px 0;
     margin-bottom: 0;
 }
 
-.buy > .body > .total-price > .price {
+.buy>.body>.total-price>.price {
     padding: 0 48px 10px 0;
 }
 
-.buy > .body > .total-price > .price > .money {
+.buy>.body>.total-price>.price>.money {
     color: #ff6700;
 }
 
-.buy > .body > .total-price > .price > .money > em {
+.buy>.body>.total-price>.price>.money>em {
     font-size: 30px;
 }
 
-.buy > .footer {
+.buy>.footer {
     min-height: 40px;
     padding: 20px 48px;
     border-top: 2px solid #f5f5f5;
@@ -339,18 +353,17 @@ export default {
     position: relative;
 }
 
-.buy > .footer > .address {
+.buy>.footer>.address {
     line-height: 20px;
     color: #424242;
 }
 
-.buy > .footer > .btns {
+.buy>.footer>.btns {
     position: absolute;
     right: 48px;
 }
 
-.buy > .footer > .btns > button:last-child{
+.buy>.footer>.btns>button:last-child {
     margin-left: 30px;
 }
-
 </style>

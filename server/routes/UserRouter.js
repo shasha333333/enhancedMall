@@ -1,47 +1,48 @@
 let express = require('express')
 let db = require("../mysql")
 let router = express.Router()
-// 引入 jwt-simple 库
-const jwt = require('jwt-simple');
 
-// 密钥，用于生成和验证 JWT
-const SECRET_KEY = 'your-secret-key';
+// 引入 Token 生成函数
+const { generateToken } = require('../middlewares/authUtils');
+// 引入 Token 验证中间件
+const { verifyToken } = require('../middlewares/authUtils');
 
 
 /**
  * 登录
  */
 function login(req, resp) {
-    let username = req.body.username
-    let password = req.body.password
+    const { username, password } = req.body;
+
     if (username && password) {
         db.sql("select * from user where username = ?", username)
             .then(res => {
-                //console.log(res);
-                if (res.length == 0)
-                    resp.send({ code: 400, message: "用户名不存在!" })
-                else if (res[0].password != password)
-                    resp.send({ code: 400, message: "密码错误!" })
-                else {
+                if (res.length == 0) {
+                    resp.send({ code: 400, message: "用户名不存在!" });
+                } else if (res[0].password != password) {
+                    resp.send({ code: 400, message: "密码错误!" });
+                } else {
                     console.log(res[0]);
 
-                    const token = jwt.encode({ id: res[0].id, username: res[0].username }, SECRET_KEY);
+                    // 生成 Token
+                    const token = generateToken(res[0]);
 
                     resp.send({
                         code: 200,
                         message: '登录成功！',
                         token: token
-                    })
+                    });
                 }
             })
             .catch(err => {
                 console.log(err);
-                resp.send({ code: 500, err })
-            })
-    } else
-        resp.send({ code: 500, message: "登录信息不完整!" })
+                resp.send({ code: 500, err });
+            });
+    } 
+    else {
+        resp.send({ code: 500, message: "登录信息不完整!" });
+    }
 }
-
 /**
  * 注册
  */
@@ -67,35 +68,25 @@ function register(req, resp) {
  * 获取登录用户信息
  */
 function profile(req, res) {
-    const token = req.headers['authorization'];
+    // 使用 req.user 来访问解码后的用户信息
+    const userId = req.session.user.id;  // 解码后的用户 ID
+    console.log(userId);
 
-    if (!token) {
-        return res.status(401).json({ message: '没有提供 token，无法访问用户信息' });
-    }
-
-    try {
-        // 验证 token 并解码
-        const decoded = jwt.decode(token.split(' ')[1], SECRET_KEY);
-
-        // 查找用户
-        db.sql("select * from user where id =?", decoded.id)
-            .then(result => { // 将内部的 res 重命名为 result
-                console.log(result[0]);
+    db.sql("SELECT * FROM user WHERE id = ?", userId)
+        .then(result => {
+            if (result.length > 0) {
                 const user = result[0];
-                if (user) {
-                    res.send({ code: 200, message: user });
-                } else {
-                    res.send({ code: 404, message: '用户不存在' });
-                }
-            })
-            .catch(err => {
-                console.log(err);
-                res.status(500).send({ code: 500, message: '数据库查询失败', error: err });
-            });
-    } catch (error) {
-        return res.status(401).json({ message: '无效的 token' });
-    }
+                res.send({ code: 200, message: user });
+            } else {
+                res.send({ code: 404, message: '用户不存在' });
+            }
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).send({ code: 500, message: '数据库查询失败', error: err });
+        });
 }
+
 
 /**
  * 退出登录
@@ -170,7 +161,7 @@ function updateEmail(req, resp) {
 
 router.post("/login", login)
 router.post("/register", register)
-router.get("/profile", profile)
+router.get("/profile", verifyToken, profile);
 router.post("/updateAvatar", updateAvatar)
 router.post("/updatePassword", updatePassword)
 router.post("/updateEmail", updateEmail)

@@ -188,7 +188,7 @@ export default {
     },
     loadUser() {
       axios.get('/api/user/profile', {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       })
         .then(res => {
           this.user = res.data.message; // 设置用户信息
