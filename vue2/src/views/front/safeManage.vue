@@ -39,7 +39,7 @@
 
       <!-- 提交按钮 -->
       <el-form-item>
-        <el-button type="primary" @click="handleSubmit">保存设置</el-button>
+        <el-button type="primary" @click="showConfirmDialog">保存设置</el-button>
       </el-form-item>
 
       <!-- 提示信息 -->
@@ -51,6 +51,20 @@
         show-icon
       />
     </el-form>
+    
+    <!-- 确认对话框 -->
+    <el-dialog
+      title="确认更新"
+      :visible.sync="dialogVisible"
+      width="400px"
+      @close="dialogVisible = false"
+    >
+      <span>您确认要更新安全设置信息吗？</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleSubmit">确认</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -91,9 +105,21 @@ export default {
           { required: false, message: '请输入验证码', trigger: 'blur' },
         ],
       },
+      dialogVisible: false, // 控制确认对话框的显示与隐藏
     };
   },
   methods: {
+    showConfirmDialog() {
+      this.$refs.securityForm.validate((valid) => {
+        if (valid) {
+          // 显示确认对话框
+          this.dialogVisible = true;
+        } else {
+          this.$message.warning('请确保所有信息填写正确');
+        }
+      });
+
+    },
     // 验证新密码与确认密码是否一致
     checkPasswordConfirmation(rule, value, callback) {
       if (value !== this.securityForm.newPassword) {
@@ -127,15 +153,11 @@ export default {
 
     // 提交表单
     handleSubmit() {
-      this.$refs.securityForm.validate((valid) => {
-        if (valid) {
-          this.updatePassword();
-          // 通过 EventBus 通知其他组件更新用户数据
-          EventBus.$emit('safeUpdated', this.securityForm);
-        } else {
-          this.$message.warning('请确保所有信息填写正确');
-        }
-      });
+
+      this.updatePassword();
+      // 通过 EventBus 通知其他组件更新用户数据
+      EventBus.$emit('safeUpdated', this.securityForm);
+      
     },
 
     // 更新用户安全设置

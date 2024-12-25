@@ -30,3 +30,9 @@ server/mysql.js         数据库连接
 ### 新增页面&修改页面
 1. 个人主页
 2. 个人信息管理
+
+### git命令
+git diff --shortstat origin/main..origin/dev -- '*.js'
+git diff --shortstat origin/main..origin/dev -- '*.vue'
+git diff origin/main..origin/dev -- '*.vue' | sed -n '/<script>/,/<\/script>/p' | grep '^-' | wc -l
+git diff origin/main..origin/dev -- '*.vue' | sed -n '/<script>/,/<\/script>/p' | grep '^+' | wc -l

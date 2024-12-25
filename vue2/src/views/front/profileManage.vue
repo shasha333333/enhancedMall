@@ -1,6 +1,12 @@
 <template>
-  <div class="profile">
-    <el-form :model="userForm" ref="userForm" :rules="updaterules" label-width="120px">
+  <div class="main">
+    <el-form 
+      :model="userForm" 
+      ref="userForm" 
+      :rules="updaterules" 
+      label-width="120px"
+      class="user-form"
+    >
       <!-- 用户名 -->
       <el-form-item label="用户名" prop="username">
         <el-input v-model="userForm.username" placeholder="请输入用户名" />
@@ -15,14 +21,14 @@
       <el-form-item label="头像：">
         <el-radio-group v-model="userForm.avatar">
           <el-radio :label="item" v-for="(item, index) in avatars" :key="index">
-            <img :src="item" style="width: 48px;height: 48px;" />
+            <img :src="item" class="avatar-img" />
           </el-radio>
         </el-radio-group>
       </el-form-item>
 
       <!-- 更新按钮 -->
       <el-form-item>
-        <el-button type="primary" @click="showConfirmDialog">更新信息</el-button>
+        <el-button type="primary" @click="showConfirmDialog" class="update-btn">更新信息</el-button>
       </el-form-item>
     </el-form>
 
@@ -34,6 +40,7 @@
       @close="dialogVisible = false"
     >
       <span>您确认要更新个人信息吗？</span>
+      
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取消</el-button>
         <el-button type="primary" @click="update">确认</el-button>
@@ -156,7 +163,7 @@ export default {
         if (updatedData.avatar) {
           await this.updateAvatar(updatedData.avatar);
         }
-        
+
         // 通过 EventBus 通知其他组件更新用户数据
         EventBus.$emit('userUpdated', updatedData);
         this.$message.success('个人信息更新成功');
@@ -253,21 +260,72 @@ export default {
 </script>
 
 <style scoped>
-.avatar {
-  margin-top: 10px;
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  overflow: hidden;
+.main {
+  width: 80vw;
+  height: 80vh;
+  margin: 0 auto;
+  padding: 30px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.avatar img {
+.user-form {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.el-form-item {
+  margin-bottom: 20px;
+}
+
+.el-form-item label {
+  font-size: 16px;
+  color: #333;
+}
+
+.el-input,
+.el-radio-group {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
 }
 
-.avatar-uploader {
-  display: inline-block;
+.avatar-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin: 0 5px;
+  transition: transform 0.3s;
+}
+
+.avatar-img:hover {
+  transform: scale(1.1);
+}
+
+.update-btn {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  background-color: #4CAF50;
+  border-color: #4CAF50;
+}
+
+.update-btn:hover {
+  background-color: #45a049;
+  border-color: #45a049;
+}
+
+.el-dialog {
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.dialog-footer {
+  text-align: right;
+}
+
+.dialog-footer .el-button {
+  font-size: 14px;
 }
 </style>

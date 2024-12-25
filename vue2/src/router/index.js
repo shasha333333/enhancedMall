@@ -18,6 +18,8 @@ const routes = [
   { path: '/profile', component: () => import('../views/front/profile.vue') },
   { path: '/profileManage', component: () => import('../views/front/profileManage.vue') },
   { path: '/safeManage', component: () => import('../views/front/safeManage.vue') },
+  { path: '/contactManage', component: () => import('../views/front/contactManage.vue') },
+  { path: '/talkUs', component: () => import('../views/front/talkUs.vue') },
 ]
 
 const router = new VueRouter({

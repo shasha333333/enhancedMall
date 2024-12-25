@@ -23,8 +23,8 @@
                                 <span class="tan-contact-info-address">{{ contact.address }}</span>
                             </div>
                             <div class="tan-contact-action">
-                                <span>删除</span>
-                                <span>修改</span>
+                                <span><router-link to="/contactManage">删除</router-link></span>
+                                <span><router-link to="/contactManage">修改</router-link></span>
                             </div>
                         </li>
                     </ul>
@@ -366,4 +366,5 @@ export default {
 .buy>.footer>.btns>button:last-child {
     margin-left: 30px;
 }
+
 </style>
