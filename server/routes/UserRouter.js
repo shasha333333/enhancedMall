@@ -75,8 +75,8 @@ function profile(req, res) {
     db.sql("SELECT * FROM user WHERE id = ?", userId)
         .then(result => {
             if (result.length > 0) {
-                // 返回用户信息，排除 password 字段
-                const user = {
+                    // 返回用户信息，排除 password 字段
+                    const user = {
                     id: result[0].id,
                     username: result[0].username,
                     email: result[0].email,

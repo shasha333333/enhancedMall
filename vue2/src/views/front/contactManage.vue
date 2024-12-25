@@ -1,5 +1,5 @@
 <template>
-  <div class="contact-manager">
+  <div class="contact-manager" style="height: 80vh;">
     <!-- 联系人列表 -->
     <div class="contact-list">
       <div class="header">
@@ -24,17 +24,17 @@
 
     <!-- 添加/编辑联系人 -->
     <el-dialog :visible.sync="showContactForm" :title="editingContact ? '编辑联系人' : '添加联系人'" width="50%">
-      <el-form :model="contactForm" ref="form" label-width="80px">
-        <el-form-item label="姓名" :rules="[{ required: true, message: '请输入姓名', trigger: 'blur' }]">
+      <el-form :model="contactForm" ref="form" label-width="80px" :rules="formRules">
+        <el-form-item label="姓名" prop="name">
           <el-input v-model="contactForm.name" required></el-input>
         </el-form-item>
-        <el-form-item label="电话" :rules="[{ required: true, message: '请输入电话', trigger: 'blur' }]">
+        <el-form-item label="电话" prop="telephone">
           <el-input v-model="contactForm.telephone" required></el-input>
         </el-form-item>
-        <el-form-item label="地址" :rules="[{ required: true, message: '请输入地址', trigger: 'blur' }]">
+        <el-form-item label="地址" prop="address">
           <el-input type="textarea" v-model="contactForm.address" required></el-input>
         </el-form-item>
-        <el-form-item label="标签" :rules="[{ required: true, message: '请输入标签', trigger: 'blur' }]">
+        <el-form-item label="标签" prop="tag">
           <el-input v-model="contactForm.tag" required></el-input>
         </el-form-item>
       </el-form>
@@ -49,6 +49,7 @@
 <script>
 import axios from 'axios';
 import { MessageBox, Message } from 'element-ui';
+
 export default {
   data() {
     return {
@@ -61,7 +62,25 @@ export default {
         id: '',
       },
       showContactForm: false, // 控制联系人表单的显示
-      editingContact: null // 当前正在编辑的联系人
+      editingContact: null, // 当前正在编辑的联系人
+      formRules: {
+        name: [
+          { required: true, message: '请输入姓名', trigger: 'blur' },
+          { min: 2, max: 50, message: '姓名长度在2到50个字符之间', trigger: 'blur' }
+        ],
+        telephone: [
+          { required: true, message: '请输入电话', trigger: 'blur' },
+          { pattern: /^1[3456789]\d{9}$/, message: '请输入有效的手机号码', trigger: 'blur' }
+        ],
+        address: [
+          { required: true, message: '请输入地址', trigger: 'blur' },
+          { min: 5, message: '地址至少5个字符', trigger: 'blur' }
+        ],
+        tag: [
+          { required: true, message: '请输入标签', trigger: 'blur' },
+          { min: 1, max: 20, message: '标签长度在1到20个字符之间', trigger: 'blur' }
+        ]
+      }
     };
   },
   created() {
@@ -95,38 +114,45 @@ export default {
     },
     // 保存联系人（添加或更新）
     saveContact() {
-      if (this.editingContact) {
-        // 编辑联系人
-        axios
-          .put(`/api/contact/${this.contactForm.id}`, this.contactForm, {
-            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-          })
-          .then(response => {
-            if (response.data.code == 200) {
-              this.$message.success(response.data.message);
-              this.fetchContacts(); // 刷新联系人列表
-              this.cancelEdit(); // 关闭表单
-            } else {
-              this.$message.warning(response.data.message);
-            }
-          })
-          .catch(error => {
-            console.error('更新联系人失败:', error);
-          });
-      } else {
-        // 添加新联系人
-        axios
-          .post('/api/contact', this.contactForm, {
-            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-          })
-          .then(response => {
-            this.fetchContacts(); // 刷新联系人列表
-            this.cancelEdit(); // 关闭表单
-          })
-          .catch(error => {
-            console.error('添加联系人失败:', error);
-          });
-      }
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          if (this.editingContact) {
+            // 编辑联系人
+            axios
+              .put(`/api/contact/${this.contactForm.id}`, this.contactForm, {
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+              })
+              .then(response => {
+                if (response.data.code == 200) {
+                  this.$message.success(response.data.message);
+                  this.fetchContacts(); // 刷新联系人列表
+                  this.cancelEdit(); // 关闭表单
+                } else {
+                  this.$message.warning(response.data.message);
+                }
+              })
+              .catch(error => {
+                console.error('更新联系人失败:', error);
+              });
+          } else {
+            // 添加新联系人
+            axios
+              .post('/api/contact', this.contactForm, {
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+              })
+              .then(response => {
+                this.fetchContacts(); // 刷新联系人列表
+                this.cancelEdit(); // 关闭表单
+              })
+              .catch(error => {
+                console.error('添加联系人失败:', error);
+              });
+          }
+        } else {
+          this.$message.error('表单验证失败，请检查填写的内容');
+          return false;
+        }
+      });
     },
     // 取消编辑
     cancelEdit() {
@@ -212,6 +238,4 @@ export default {
 .dialog-footer {
   text-align: right;
 }
-
-
 </style>

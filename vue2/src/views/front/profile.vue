@@ -119,7 +119,7 @@
               class="order-card" 
               v-for="order in orders" 
               :key="order.id" 
-              style="margin-bottom: 20px;">
+              style="margin-bottom: 20px;max-height: 20vh;">
               <div class="order-header">
                 <el-tag :type="order.paid ? 'success' : 'warning'" class="status">
                   {{ order.paid ? '已支付' : '未支付' }}
@@ -158,13 +158,14 @@
                       {{ detail.product_name + " " + detail.detail_name }}
                     </h3>
                   </router-link>
-                  <div class="quantity" style="display: flex; align-items: center; justify-content: center;">{{ detail.sale_price }} * {{ detail.quantity }}</div>
+                  
                 </el-col>
+                <div class="quantity" style="display: flex; align-items: center; justify-content: center;">{{ detail.sale_price }} * {{ detail.quantity }}</div>
               </el-row>
             </el-card>
             
             <!-- 遮罩层 -->
-            <div class="mask"></div>
+            <!-- <div class="mask"></div> -->
           </div>
         </el-card>
       </div>
@@ -216,6 +217,9 @@ export default {
         .then(res => {
           this._orders = res.data;
           this.orders = res.data;
+          this.orders.forEach(order => {
+            console.log("Order details: ", order.details);  // 查看每个订单的详情
+          });
         })
         .catch((err) => {
           console.log(err);
@@ -316,8 +320,8 @@ export default {
 /* 限制订单内容的显示区域 */
 .order-list .body {
   height: 50vh; /* 设置卡片内容区域的高度 */
-  overflow: hidden; /* 隐藏超出部分 */
   position: relative;
+  overflow-y: auto; /* 允许滚动 */
 }
 
 /* 模糊效果样式 */
@@ -436,6 +440,10 @@ export default {
 .info-item {
   font-size: 16px;
   color: #666;
+}
+
+.el-row {
+  max-height: 20vh; /* 设置最大高度 */
 }
 
 </style>

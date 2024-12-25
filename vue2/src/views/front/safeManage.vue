@@ -1,6 +1,6 @@
 <template>
-  <div class="user-security">
-    <el-form :model="securityForm" ref="securityForm" :rules="formRules" label-width="150px">
+  <div class="user-security" >
+    <el-form :model="securityForm" ref="securityForm" :rules="formRules" label-width="150px" >
       <!-- 修改密码 -->
       <el-form-item label="旧密码" prop="oldPassword">
         <el-input type="password" v-model="securityForm.oldPassword" placeholder="请输入旧密码" />
@@ -91,7 +91,7 @@ export default {
         ],
         newPassword: [
           { required: true, message: '请输入新密码', trigger: 'blur' },
-          { min: 3, message: '密码长度至少为6个字符', trigger: 'blur' },
+          { min: 3, message: '密码长度至少为3个字符', trigger: 'blur' },
         ],
         confirmPassword: [
           { required: true, message: '请确认新密码', trigger: 'blur' },

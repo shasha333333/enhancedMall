@@ -6,6 +6,7 @@
       :rules="updaterules" 
       label-width="120px"
       class="user-form"
+      style="height: 80vh;"
     >
       <!-- 用户名 -->
       <el-form-item label="用户名" prop="username">
@@ -164,12 +165,16 @@ export default {
           await this.updateAvatar(updatedData.avatar);
         }
 
-        // 通过 EventBus 通知其他组件更新用户数据
-        EventBus.$emit('userUpdated', updatedData);
-        this.$message.success('个人信息更新成功');
+        // 隐藏确认对话框
+        this.dialogVisible = false;
       } catch (error) {
         console.error('个人信息更新失败:', error);
         this.$message.error('更新失败，请稍后重试');
+      } finally {
+
+        // 通过 EventBus 通知其他组件更新用户数据
+        EventBus.$emit('userUpdated', updatedData);
+        // this.$message.success('个人信息更新成功');
       }
     },
 
@@ -185,12 +190,16 @@ export default {
           // this.$message.success(res.data.message);
           console.log(res.data.message);
         } else {
-          this.$message.warning(res.data.message);
+          this.$message({
+                  showClose: true,
+                  message: "用户名已存在!",
+                  type: 'error'
+                });
           console.log(res.data.message);
         }
       } catch (err) {
         console.log(err);
-        this.$message.warning('更新用户名失败');
+        this.$message.warning(res.data.message);
       }
     },
 
@@ -206,7 +215,11 @@ export default {
           // this.$message.success(res.data.message);
           console.log(res.data.message);
         } else {
-          this.$message.warning(res.data.message);
+          this.$message({
+                  showClose: true,
+                  message: "email已存在!",
+                  type: 'error'
+                });
           console.log(res.data.message);
         }
       } catch (err) {

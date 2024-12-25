@@ -1,5 +1,5 @@
 <template>
-  <div class="contact-us">
+  <div class="contact-us" style="height: 80vh;">
     <h2>联系我们</h2>
     <form @submit.prevent="handleSubmit">
       <div class="form-group">

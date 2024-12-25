@@ -67,14 +67,14 @@
       </div>
     </el-dialog>
     <el-dialog title="注册" :visible.sync="regFormVisible">
-      <el-form :model="regform" :label-width="formLabelWidth">
-        <el-form-item label="用户名：">
+      <el-form :model="regform" ref="regform" :rules="regrules" :label-width="formLabelWidth">
+        <el-form-item label="用户名：" prop="name">
           <el-input v-model="regform.name" placeholder="请输入用户名"></el-input>
         </el-form-item>
-        <el-form-item label="密码：">
+        <el-form-item label="密码：" prop="password">
           <el-input v-model="regform.password" placeholder="请输入密码" show-password></el-input>
         </el-form-item>
-        <el-form-item label="电子邮箱：">
+        <el-form-item label="电子邮箱：" prop="email">
           <el-input v-model="regform.email" placeholder="请输入电子邮箱："></el-input>
         </el-form-item>
         <el-form-item label="头像：">
@@ -130,6 +130,37 @@ export default {
         password: "",
         email: "",
         avatar: "",
+      },
+      regrules: {
+        name: [
+          {
+            required: true,
+            message: "请输入用户名",
+            trigger: "blur"
+          },
+          {
+            min: 3,
+            max: 10,
+            message: "长度在 3 到 10 个字符",
+            trigger: "blur",
+          },
+        ],
+        password: [
+          { required: true, message: "请输入密码", trigger: "change" },
+          { min: 3, message: "密码长度不少于3个字符", trigger: "change" },
+        ],
+        email: [
+          {
+            required: true,
+            message: "请输入邮箱",
+            trigger: "blur"
+          },
+          {
+            type: "email",
+            message: "请输入正确的邮箱地址",
+            trigger: "blur"
+          },
+        ],
       },
 
     }
@@ -212,34 +243,41 @@ export default {
         });
     },
     doRegister() {
-      axios
-        .post("/api/user/register", {
-          username: this.regform.name,
-          password: this.regform.password,
-          email: this.regform.email,
-          avatar: this.regform.avatar,
-        })
-        .then((res) => {
-          console.log(res);
-          if (res.data.code == 200) {
-            this.$message({
-              showClose: true,
-              message: '注册成功！',
-              type: 'success'
+      this.$refs["regform"].validate((valid) => {
+        if (valid) {
+          axios
+            .post("/api/user/register", {
+              username: this.regform.name,
+              password: this.regform.password,
+              email: this.regform.email,
+              avatar: this.regform.avatar,
+            })
+            .then((res) => {
+              console.log(res);
+              if (res.data.code == 200) {
+                this.$message({
+                  showClose: true,
+                  message: '注册成功！',
+                  type: 'success'
+                });
+                this.loginFormVisible = true;
+                this.regFormVisible = false;
+              } else {
+                this.$message({
+                  showClose: true,
+                  message: "用户名或者email已存在!",
+                  type: 'error'
+                });
+              }
+            })
+            .catch((err) => {
+              console.log(err);
             });
-            this.loginFormVisible = true;
-            this.regFormVisible = false;
-          } else {
-            this.$message({
-              showClose: true,
-              message: "用户名或者email已存在!",
-              type: 'error'
-            });
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+        } else {
+          this.$message.error("数据格式有误！");
+          return false;
+        }
+      });
     },
     dologout() {
       axios
